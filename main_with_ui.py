@@ -9,6 +9,11 @@ import sys
 
 def simThreadFunc(appDir):
     coppeliaSimLib.simInitialize(c_char_p(appDir.encode('utf-8')), 0)
+
+    #stack = coppeliaSimLib.simCreateStack()
+    #r = coppeliaSimLib.simCallScriptFunctionEx(8, c_char_p('foo'.encode('ascii')), stack)
+    #coppeliaSimLib.simReleaseStack(stack)
+
     while not coppeliaSimLib.simGetExitRequest():
         coppeliaSimLib.simLoop(None, 0)
     coppeliaSimLib.simDeinitialize()
