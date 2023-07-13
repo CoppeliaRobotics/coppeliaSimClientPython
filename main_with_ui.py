@@ -6,20 +6,27 @@
 # to avoid other similar load errors
 
 from ctypes import *
+import argparse
 import threading
 import os
+import sys
 
-def simThreadFunc():
-    appDir = os.getcwd()
-    coppeliaSimLib.simInitialize(appDir, 0)
+def simThreadFunc(appDir):
+    coppeliaSimLib.simInitialize(c_char_p(appDir.encode('utf-8')), 0)
     while not coppeliaSimLib.simGetExitRequest():
         coppeliaSimLib.simLoop(None, 0)
     coppeliaSimLib.simDeinitialize()
 
-coppeliaSimLib = cdll.LoadLibrary('libcoppeliaSim.dylib')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='CoppeliaSim client.')
+    parser.add_argument('coppeliaSim_library', type=str, help='Path to the coppeliaSim shared library')
+    args = parser.parse_args()
 
-t = threading.Thread(target=simThreadFunc)
-t.start()
-options = 0x0ffff # sim_gui_all
-coppeliaSimLib.simRunGui(options)
-t.join()
+    coppeliaSimLib = cdll.LoadLibrary(args.coppeliaSim_library)
+    appDir = os.path.dirname(args.coppeliaSim_library)
+
+    t = threading.Thread(target=simThreadFunc, args=(appDir,))
+    t.start()
+    options = 0x0ffff # sim_gui_all
+    coppeliaSimLib.simRunGui(options)
+    t.join()
