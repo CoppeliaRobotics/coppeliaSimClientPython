@@ -16,6 +16,7 @@ def simThreadFunc(appDir):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CoppeliaSim client.')
     parser.add_argument('coppeliaSim_library', type=str, help='Path to the coppeliaSim shared library')
+    parser.add_argument('-H', '--headless', action='store_true')
     args = parser.parse_args()
 
     coppeliaSimLib = cdll.LoadLibrary(args.coppeliaSim_library)
@@ -23,6 +24,8 @@ if __name__ == '__main__':
 
     t = threading.Thread(target=simThreadFunc, args=(appDir,))
     t.start()
-    options = 0x0ffff # sim_gui_all
+    sim_gui_all = 0x0ffff
+    sim_gui_headless = 0x10000
+    options = sim_gui_headless if args.headless else sim_gui_all
     coppeliaSimLib.simRunGui(options)
     t.join()
