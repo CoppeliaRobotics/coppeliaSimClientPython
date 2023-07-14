@@ -11,10 +11,12 @@ import sys
 def simThreadFunc(appDir):
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
 
-    simLoadBridge()
+    simBridge.load()
 
-    # example: call an API function:
-    print(simCallFunction('sim.getStringParam', [141]))
+    # example: use API functions:
+    sim = simBridge.require('sim')
+    print('sim.getStringParam(sim.stringparam_resourcesdir)', sim.getStringParam(sim.stringparam_resourcesdir))
+    # ---------------------------
 
     while not simGetExitRequest():
         simLoop(None, 0)
