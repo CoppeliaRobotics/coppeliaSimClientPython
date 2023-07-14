@@ -15,7 +15,9 @@ def simThreadFunc(appDir):
 
     # example: use API functions:
     sim = simBridge.require('sim')
-    print('sim.getStringParam(sim.stringparam_resourcesdir)', sim.getStringParam(sim.stringparam_resourcesdir))
+    v = sim.getInt32Param(sim.intparam_program_full_version)
+    version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
+    print('CoppeliaSim version is:', version)
     # ---------------------------
 
     while not simGetExitRequest():
