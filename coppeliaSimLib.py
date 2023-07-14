@@ -29,7 +29,7 @@ class simBridge:
     @staticmethod
     def load():
         stack = simCreateStack()
-        simPushStringOntoStack(stack, c_char_p('python-client-bridge'.encode('ascii')), 0)
+        simPushStringOntoStack(stack, c_char_p('scriptClientBridge'.encode('ascii')), 0)
         r = simCallScriptFunctionEx(8, c_char_p('require'.encode('ascii')), stack)
         simReleaseStack(stack)
 
@@ -39,7 +39,7 @@ class simBridge:
         import cbor
         b = cbor.dumps({'func': func, 'args': args})
         simPushStringOntoStack(stack, c_char_p(b), len(b))
-        r = simCallScriptFunctionEx(8, c_char_p('pythonClientBridge.call'.encode('ascii')), stack)
+        r = simCallScriptFunctionEx(8, c_char_p('scriptClientBridge.call'.encode('ascii')), stack)
         sz = c_int()
         ptr = simGetStackStringValue(stack, byref(sz))
         o = cbor.loads(string_at(ptr, sz.value))
@@ -58,7 +58,7 @@ class simBridge:
     def getObject(name, _info=None):
         ret = type(name, (), {})
         if not _info:
-            _info = simBridge.call('pythonClientBridge.info', [name])
+            _info = simBridge.call('scriptClientBridge.info', [name])
         for k, v in _info.items():
             if not isinstance(v, dict):
                 raise ValueError('found nondict')
