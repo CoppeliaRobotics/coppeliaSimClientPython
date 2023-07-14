@@ -32,6 +32,9 @@ if __name__ == '__main__':
 
     appDir = os.path.dirname(args.coppeliaSim_library)
 
+    import os
+    os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
+
     t = threading.Thread(target=simThreadFunc, args=(appDir,))
     t.start()
     sim_gui_all = 0x0ffff
