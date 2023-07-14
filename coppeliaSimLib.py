@@ -36,7 +36,7 @@ def simCallFunction(func, args):
     import cbor
     b = cbor.dumps({'func': func, 'args': args})
     simPushStringOntoStack(stack, c_char_p(b), len(b))
-    r = simCallScriptFunctionEx(8, c_char_p('__call'.encode('ascii')), stack)
+    r = simCallScriptFunctionEx(8, c_char_p('pythonClientBridge.call'.encode('ascii')), stack)
     sz = c_int()
     ptr = simGetStackStringValue(stack, byref(sz))
     o = cbor.loads(string_at(ptr, sz.value))
