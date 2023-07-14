@@ -11,10 +11,10 @@ import sys
 def simThreadFunc(appDir):
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
 
-    bridge.load()
+    simLoadBridge()
 
     # example: call an API function:
-    print(bridge.call('sim.getStringParam', [141]))
+    print(simCallFunction('sim.getStringParam', [141]))
 
     while not simGetExitRequest():
         simLoop(None, 0)
@@ -28,7 +28,6 @@ if __name__ == '__main__':
 
     builtins.coppeliaSim_library = args.coppeliaSim_library
     from coppeliaSimLib import *
-    import coppeliaSimLib_bridge as bridge
 
     appDir = os.path.dirname(args.coppeliaSim_library)
 
