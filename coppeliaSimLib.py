@@ -28,9 +28,8 @@ coppeliaSimLib.simDeinitialize.restype = c_int
 __all__ = []
 
 for name in dir(coppeliaSimLib):
-    if not name.startswith('__'):
+    if name.startswith('sim'):
         f = getattr(coppeliaSimLib, name)
         if callable(f):
-            print(f'coppeliaSimLib: {name}')
             globals()[name] = f
             __all__.append(name)
