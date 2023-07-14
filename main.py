@@ -17,7 +17,6 @@ if __name__ == '__main__':
 
     appDir = os.path.dirname(args.coppeliaSim_library)
 
-    import os
     os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
 
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
