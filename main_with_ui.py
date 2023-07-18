@@ -8,18 +8,48 @@ import threading
 import os
 import sys
 
+def simStart():
+    if sim.getSimulationState()==sim.simulation_stopped:
+        sim.startSimulation()
+    
+def simStep():
+    if sim.getSimulationState()!=sim.simulation_stopped:
+        t=sim.getSimulationTime()
+        while t==sim.getSimulationTime():
+            simLoop(None, 0)
+    
+def simStop():
+    while sim.getSimulationState()!=sim.simulation_stopped:
+        sim.stopSimulation()
+        simLoop(None, 0)
+
 def simThreadFunc(appDir):
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
 
     simBridge.load()
 
-    # example: use API functions:
+    # fetch CoppeliaSim API sim-namespace functions:
+    global sim
     sim = simBridge.require('sim')
+
     v = sim.getInt32Param(sim.intparam_program_full_version)
     version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
     print('CoppeliaSim version is:', version)
-    # ---------------------------
-
+    
+    # example: load a scene, run the simulation for 1000 steps, then quit:
+    '''
+    sim.loadScene('path/to/scene.ttt')
+    simStart()
+    for i in range(1000):
+        t=sim.getSimulationTime()
+        s = f'Simulation time: {t:.2f} [s] (simulation running synchronously to client, i.e. stepped)'
+        print(s)
+        simStep()
+    simStop()
+    simDeinitialize()
+    '''
+    
+    # example: simply run CoppeliaSim:
     while not simGetExitRequest():
         simLoop(None, 0)
     simDeinitialize()
