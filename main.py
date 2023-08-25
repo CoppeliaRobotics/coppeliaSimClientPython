@@ -1,11 +1,14 @@
 # need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
 # to avoid libraries load errors
 
-from ctypes import *
 import argparse
-import threading
+import builtins
 import os
 import sys
+import threading
+
+from ctypes import *
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CoppeliaSim client.')
