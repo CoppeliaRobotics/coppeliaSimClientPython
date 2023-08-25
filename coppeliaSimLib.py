@@ -1,6 +1,7 @@
 from ctypes import *
 import builtins
 
+
 coppeliaSimLib = cdll.LoadLibrary(builtins.coppeliaSim_library)
 coppeliaSimLib.simRunGui.argtypes = [c_int]
 coppeliaSimLib.simRunGui.restype = None
@@ -24,6 +25,11 @@ coppeliaSimLib.simLoop.argtypes = [c_void_p, c_int]
 coppeliaSimLib.simLoop.restype = c_int
 coppeliaSimLib.simDeinitialize.argtypes = []
 coppeliaSimLib.simDeinitialize.restype = c_int
+coppeliaSimLib.simSetStringParam.argtypes = [c_int, c_char_p]
+coppeliaSimLib.simSetStringParam.restype = c_int
+coppeliaSimLib.simSetNamedStringParam.argtypes = [c_char_p, c_char_p, c_int]
+coppeliaSimLib.simSetNamedStringParam.restype = c_int
+
 
 class simBridge:
     @staticmethod
@@ -74,6 +80,7 @@ class simBridge:
     def require(obj):
         o = simBridge.getObject(obj)
         return o
+
 
 __all__ = ['simBridge']
 
