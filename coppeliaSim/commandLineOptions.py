@@ -26,7 +26,7 @@ def add(parser):
 
 def parse(args):
     from ctypes import c_char_p
-    from coppeliaSimLib import simSetStringParam, simSetNamedStringParam
+    from coppeliaSim.lib import simSetStringParam, simSetNamedStringParam
 
     if args.startup_script_string:
         sim_stringparam_startupscriptstring = 125

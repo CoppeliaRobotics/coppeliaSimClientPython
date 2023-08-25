@@ -26,13 +26,15 @@ def simStop():
         simLoop(None, 0)
 
 def simThreadFunc(appDir):
+    import coppeliaSim.bridge
+
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
 
-    simBridge.load()
+    coppeliaSim.bridge.load()
 
     # fetch CoppeliaSim API sim-namespace functions:
     global sim
-    sim = simBridge.require('sim')
+    sim = coppeliaSim.bridge.require('sim')
 
     v = sim.getInt32Param(sim.intparam_program_full_version)
     version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
@@ -56,15 +58,15 @@ def simThreadFunc(appDir):
     simDeinitialize()
 
 if __name__ == '__main__':
+    import coppeliaSim.commandLineOptions
     parser = argparse.ArgumentParser(description='CoppeliaSim client.')
-    import commandLineOptions
-    commandLineOptions.add(parser)
+    coppeliaSim.commandLineOptions.add(parser)
     args = parser.parse_args()
 
     builtins.coppeliaSim_library = args.coppeliasim_library
-    from coppeliaSimLib import *
+    from coppeliaSim.lib import *
 
-    options = commandLineOptions.parse(args)
+    options = coppeliaSim.commandLineOptions.parse(args)
 
     appDir = os.path.dirname(args.coppeliasim_library)
 
