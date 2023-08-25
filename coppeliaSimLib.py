@@ -1,6 +1,13 @@
-from ctypes import *
 import builtins
+import os
+import sys
 
+from ctypes import *
+
+
+if not os.path.isfile(builtins.coppeliaSim_library):
+    print(f'{os.path.basename(sys.argv[0])}: error: the specified coppeliaSim library does not exist')
+    sys.exit(1)
 
 coppeliaSimLib = cdll.LoadLibrary(builtins.coppeliaSim_library)
 coppeliaSimLib.simRunGui.argtypes = [c_int]
