@@ -1,14 +1,28 @@
 def add(parser):
-    parser.add_argument('-L', '--coppeliasim-library', type=str, required=True, help='Path to the coppeliaSim shared library')
-    parser.add_argument('-c', '--startup-script-string', type=str)
-    parser.add_argument('-v', '--verbosity', type=str)
-    parser.add_argument('-w', '--statusbar-verbosity', type=str)
-    parser.add_argument('-x', '--dlg-verbosity', type=str)
-    parser.add_argument('-a', '--additional-addon-script-1', type=str)
-    parser.add_argument('-b', '--additional-addon-script-2', type=str)
-    parser.add_argument('-g', '--app-arg', action='append', type=str)
-    parser.add_argument('-G', '--named-param', action='append', type=str)
-    parser.add_argument('-H', '--headless', action='store_true')
+    parser.add_argument('-L', '--coppeliasim-library', metavar='library', type=str,
+                        required=True,
+                        help='Path to the coppeliaSim shared library')
+    parser.add_argument('-c', '--startup-script-string', metavar='string', type=str,
+                        help='Executes the script string as soon as the sandbox script is initialized')
+    parser.add_argument('-v', '--verbosity', metavar='verbosity', type=str,
+                        help='Sets the verbosity level, in the console. Default is loadinfos. Other accepted values are: none, errors, warnings, loadinfos, scripterrors, scriptwarnings, scriptinfos, infos, debug, trace, tracelua and traceall.')
+    parser.add_argument('-w', '--statusbar-verbosity', metavar='verbosity', type=str,
+                        help='Similar to -v, but for the verbosity level in the status bar. Default is scriptinfos.')
+    parser.add_argument('-x', '--dlg-verbosity', metavar='verbosity', type=str,
+                        help='Similar to -v, but for the verbosity level for simple dialogs. Default is infos. Other accepted values are: none, errors, warnings and questions.')
+    parser.add_argument('-a', '--additional-addon-script-1', metavar='script', type=str,
+                        help='Loads and runs an additional add-on specified via its filename.')
+    parser.add_argument('-b', '--additional-addon-script-2', metavar='script', type=str,
+                        help='Loads and runs an additional add-on specified via its filename.')
+    parser.add_argument('-g', '--app-arg', metavar='arg', type=str,
+                        action='append',
+                        help='Represents an optional argument that can be queried within CoppeliaSim with the sim.stringparam_app_arg1 ... sim.stringparam_app_arg9 parameters.')
+    parser.add_argument('-G', '--named-param', metavar='key=value', type=str,
+                        action='append',
+                        help='Set the named parameter, e.g. "key", to the given value.')
+    parser.add_argument('-H', '--headless',
+                        action='store_true',
+                        help='Runs CoppeliaSim in headless mode (i.e. without any GUI).')
 
 def parse(args):
     from ctypes import c_char_p
