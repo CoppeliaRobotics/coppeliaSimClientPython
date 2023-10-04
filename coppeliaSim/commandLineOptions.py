@@ -23,6 +23,7 @@ def add(parser):
     parser.add_argument('-H', '--headless',
                         action='store_true',
                         help='Runs CoppeliaSim in headless mode (i.e. without any GUI).')
+    parser.add_argument('-O', '--options', metavar='options', type=int, default=-1)
 
 def parse(args):
     from ctypes import c_char_p
@@ -77,5 +78,5 @@ def parse(args):
     if args.headless:
         options = sim_gui_headless
     else:
-        options = sim_gui_all
+        options = sim_gui_all if args.options == -1 else args.options
     return options
