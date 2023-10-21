@@ -5,11 +5,21 @@ import sys
 from ctypes import *
 
 
-if not os.path.isfile(builtins.coppeliaSim_library):
-    print(f'{os.path.basename(sys.argv[0])}: error: the specified coppeliaSim library does not exist')
+if not os.path.isfile(builtins.coppeliasim_library):
+    print(f'{os.path.basename(sys.argv[0])}: error: the specified coppeliaSim library does not exist: {builtins.coppeliasim_library}')
     sys.exit(1)
 
-coppeliaSimLib = cdll.LoadLibrary(builtins.coppeliaSim_library)
+appDir = os.path.dirname(builtins.coppeliasim_library)
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
+
+import platform
+plat = platform.system()
+if plat == 'Darwin':
+    fd = os.path.normpath(appDir + '/../Frameworks')
+    os.environ['DYLD_LIBRARY_PATH'] = fd + ':' + os.environ.get('DYLD_LIBRARY_PATH', '')
+    print(f'If next step fails, do: export DYLD_LIBRARY_PATH={fd}:$DYLD_LIBRARY_PATH and relaunch.')
+
+coppeliaSimLib = cdll.LoadLibrary(builtins.coppeliasim_library)
 coppeliaSimLib.simRunGui.argtypes = [c_int]
 coppeliaSimLib.simRunGui.restype = None
 coppeliaSimLib.simCreateStack.argtypes = []

@@ -1,6 +1,16 @@
-def add(parser):
+def add(parser, mainPath):
+    from pathlib import Path
+    libPath = Path(mainPath).absolute().parent
+    import platform
+    plat = platform.system()
+    if plat == 'Windows':
+        libPath /= 'coppeliaSim.dll'
+    elif plat == 'Linux':
+        libPath /= 'libcoppeliaSim.so'
+    elif plat == 'Darwin':
+        libPath = libPath / '..' / 'MacOS' / 'libcoppeliaSim.dylib'
     parser.add_argument('-L', '--coppeliasim-library', metavar='library', type=str,
-                        required=True,
+                        default=str(libPath),
                         help='Path to the coppeliaSim shared library')
     parser.add_argument('-c', '--startup-script-string', metavar='string', type=str,
                         help='Executes the script string as soon as the sandbox script is initialized')
@@ -27,7 +37,7 @@ def add(parser):
 
 def parse(args):
     from ctypes import c_char_p
-    from coppeliaSim.lib import simSetStringParam, simSetNamedStringParam
+    from coppeliasim.lib import simSetStringParam, simSetNamedStringParam
 
     if args.startup_script_string:
         sim_stringparam_startupscriptstring = 125

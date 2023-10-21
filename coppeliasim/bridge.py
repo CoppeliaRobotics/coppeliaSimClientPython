@@ -1,6 +1,6 @@
 from ctypes import *
 
-from coppeliaSim.lib import *
+from coppeliasim.lib import *
 
 
 def __f(f):

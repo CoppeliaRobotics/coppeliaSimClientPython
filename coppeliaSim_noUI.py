@@ -7,20 +7,21 @@ import os
 import sys
 import threading
 
+from pathlib import Path
 from ctypes import *
 
 
 if __name__ == '__main__':
+    sys.path.append(str(Path(__file__).absolute().parent / 'python'))
+
     parser = argparse.ArgumentParser(description='CoppeliaSim client.')
-    parser.add_argument('coppeliaSim_library', type=str, help='Path to the coppeliaSim shared library')
+    coppeliasim.cmdopt.add(parser, __file__)
     args = parser.parse_args()
 
-    builtins.coppeliaSim_library = args.coppeliaSim_library
-    from coppeliaSimLib import *
+    builtins.coppeliasim_library = args.coppeliasim_library
+    from coppeliasim.lib import *
 
-    appDir = os.path.dirname(args.coppeliaSim_library)
-
-    os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
+    appDir = os.path.dirname(args.coppeliasim_library)
 
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
     while not simGetExitRequest():

@@ -13,6 +13,8 @@ if(NOT COPPELIASIM_INCLUDE_DIR)
         set(COPPELIASIM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include)
     endif()
 endif()
+list(APPEND CMAKE_MODULE_PATH ${COPPELIASIM_INCLUDE_DIR}/cmake)
+find_package(CoppeliaSim 4.6.0.0 REQUIRED)
 
 include_directories("${COPPELIASIM_INCLUDE_DIR}")
 
@@ -25,5 +27,5 @@ elseif(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
-add_executable(main_with_ui main_with_ui.cpp "${COPPELIASIM_INCLUDE_DIR}/simLib/simLib.cpp")
-target_link_libraries(main_with_ui Qt5::Core)
+coppeliasim_add_resource(coppeliaSim.py)
+coppeliasim_add_python_directory(coppeliasim)

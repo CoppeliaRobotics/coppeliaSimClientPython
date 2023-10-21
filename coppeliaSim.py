@@ -7,6 +7,7 @@ import os
 import sys
 import threading
 
+from pathlib import Path
 from ctypes import *
 
 
@@ -26,15 +27,15 @@ def simStop():
         simLoop(None, 0)
 
 def simThreadFunc(appDir):
-    import coppeliaSim.bridge
+    import coppeliasim.bridge
 
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
 
-    coppeliaSim.bridge.load()
+    coppeliasim.bridge.load()
 
     # fetch CoppeliaSim API sim-namespace functions:
     global sim
-    sim = coppeliaSim.bridge.require('sim')
+    sim = coppeliasim.bridge.require('sim')
 
     v = sim.getInt32Param(sim.intparam_program_full_version)
     version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
@@ -58,19 +59,19 @@ def simThreadFunc(appDir):
     simDeinitialize()
 
 if __name__ == '__main__':
-    import coppeliaSim.commandLineOptions
+    sys.path.append(str(Path(__file__).absolute().parent / 'python'))
+
+    import coppeliasim.cmdopt
     parser = argparse.ArgumentParser(description='CoppeliaSim client.')
-    coppeliaSim.commandLineOptions.add(parser)
+    coppeliasim.cmdopt.add(parser, __file__)
     args = parser.parse_args()
 
-    builtins.coppeliaSim_library = args.coppeliasim_library
-    from coppeliaSim.lib import *
+    builtins.coppeliasim_library = args.coppeliasim_library
+    from coppeliasim.lib import *
 
-    options = coppeliaSim.commandLineOptions.parse(args)
+    options = coppeliasim.cmdopt.parse(args)
 
     appDir = os.path.dirname(args.coppeliasim_library)
-
-    os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
 
     t = threading.Thread(target=simThreadFunc, args=(appDir,))
     t.start()
