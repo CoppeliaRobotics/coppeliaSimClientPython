@@ -1,14 +1,14 @@
-def add(parser, mainPath):
+def add(parser, mainPath, defaultLibNameBase = 'coppeliaSim'):
     from pathlib import Path
     libPath = Path(mainPath).absolute().parent
     import platform
     plat = platform.system()
     if plat == 'Windows':
-        libPath /= 'coppeliaSim.dll'
+        libPath /= defaultLibNameBase + '.dll'
     elif plat == 'Linux':
-        libPath /= 'libcoppeliaSim.so'
+        libPath /= 'lib' + defaultLibNameBase + '.so'
     elif plat == 'Darwin':
-        libPath = libPath / '..' / 'MacOS' / 'libcoppeliaSim.dylib'
+        libPath = libPath / '..' / 'MacOS' / 'lib' + defaultLibNameBase + '.dylib'
     parser.add_argument('-L', '--coppeliasim-library', metavar='library', type=str,
                         default=str(libPath),
                         help='Path to the coppeliaSim shared library')
