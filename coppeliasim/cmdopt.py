@@ -1,39 +1,36 @@
-def add(parser, mainPath, defaultLibNameBase = 'coppeliaSim'):
-    from pathlib import Path
-    libPath = Path(mainPath).absolute().parent
-    import platform
-    plat = platform.system()
-    if plat == 'Windows':
-        libPath /= defaultLibNameBase + '.dll'
-    elif plat == 'Linux':
-        libPath /= 'lib' + defaultLibNameBase + '.so'
-    elif plat == 'Darwin':
-        libPath = libPath / '..' / 'MacOS' / 'lib' + defaultLibNameBase + '.dylib'
+def add(parser):
+    parser.add_argument('--help',
+                        action='help',
+                        help='show this help message and exit')
+    parser.add_argument('-h', '--headless',
+                        action='store_true',
+                        help='runs CoppeliaSim in an emulated headless mode: this simply suppresses all GUI elements')
+    parser.add_argument('-H', '--true-headless',
+                        action='store_true',
+                        help='runs CoppeliaSim in true headless mode (i.e. without any GUI or GUI dependencies, via library "coppeliaSimHeadless")')
+    parser.add_argument('-O', '--options', metavar='options', type=int, default=-1,
+                        help='options for the GUI')
     parser.add_argument('-L', '--coppeliasim-library', metavar='library', type=str,
-                        default=str(libPath),
+                        default='default',
                         help='Path to the coppeliaSim shared library')
-    parser.add_argument('-c', '--startup-script-string', metavar='string', type=str,
-                        help='Executes the script string as soon as the sandbox script is initialized')
-    parser.add_argument('-v', '--verbosity', metavar='verbosity', type=str,
-                        help='Sets the verbosity level, in the console. Default is loadinfos. Other accepted values are: none, errors, warnings, loadinfos, scripterrors, scriptwarnings, scriptinfos, infos, debug, trace, tracelua and traceall.')
-    parser.add_argument('-w', '--statusbar-verbosity', metavar='verbosity', type=str,
-                        help='Similar to -v, but for the verbosity level in the status bar. Default is scriptinfos.')
-    parser.add_argument('-x', '--dlg-verbosity', metavar='verbosity', type=str,
-                        help='Similar to -v, but for the verbosity level for simple dialogs. Default is infos. Other accepted values are: none, errors, warnings and questions.')
-    parser.add_argument('-a', '--additional-addon-script-1', metavar='script', type=str,
-                        help='Loads and runs an additional add-on specified via its filename.')
-    parser.add_argument('-b', '--additional-addon-script-2', metavar='script', type=str,
-                        help='Loads and runs an additional add-on specified via its filename.')
     parser.add_argument('-g', '--app-arg', metavar='arg', type=str,
                         action='append',
-                        help='Represents an optional argument that can be queried within CoppeliaSim with the sim.stringparam_app_arg1 ... sim.stringparam_app_arg9 parameters.')
+                        help='Represents an optional argument that can be queried within CoppeliaSim with the sim.stringparam_app_arg1 ... sim.stringparam_app_arg9 parameters')
     parser.add_argument('-G', '--named-param', metavar='key=value', type=str,
                         action='append',
-                        help='Set the named parameter, e.g. "key", to the given value.')
-    parser.add_argument('-H', '--headless',
-                        action='store_true',
-                        help='Runs CoppeliaSim in headless mode (i.e. without any GUI).')
-    parser.add_argument('-O', '--options', metavar='options', type=int, default=-1)
+                        help='Set the named parameter, e.g. "key", to the given value')
+    parser.add_argument('-v', '--verbosity', metavar='verbosity', type=str,
+                        help='Sets the verbosity level, in the console. Default is loadinfos. Other accepted values are: none, errors, warnings, loadinfos, scripterrors, scriptwarnings, scriptinfos, infos, debug, trace, tracelua and traceall')
+    parser.add_argument('-w', '--statusbar-verbosity', metavar='verbosity', type=str,
+                        help='Similar to -v, but for the verbosity level in the status bar. Default is scriptinfos')
+    parser.add_argument('-x', '--dlg-verbosity', metavar='verbosity', type=str,
+                        help='Similar to -v, but for the verbosity level for simple dialogs. Default is infos. Other accepted values are: none, errors, warnings and questions')
+    parser.add_argument('-c', '--startup-script-string', metavar='string', type=str,
+                        help='Executes the script string as soon as the sandbox script is initialized')
+    parser.add_argument('-a', '--additional-addon-script-1', metavar='script', type=str,
+                        help='Loads and runs an additional add-on specified via its filename')
+    parser.add_argument('-b', '--additional-addon-script-2', metavar='script', type=str,
+                        help='Loads and runs an additional add-on specified via its filename')
 
 def parse(args):
     from ctypes import c_char_p
@@ -85,7 +82,7 @@ def parse(args):
 
     sim_gui_all = 0x0ffff
     sim_gui_headless = 0x10000
-    if args.headless:
+    if args.headless or args.true_headless:
         options = sim_gui_headless
     else:
         options = sim_gui_all if args.options == -1 else args.options

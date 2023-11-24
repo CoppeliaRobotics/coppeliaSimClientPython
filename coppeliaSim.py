@@ -62,10 +62,25 @@ if __name__ == '__main__':
     sys.path.append(str(Path(__file__).absolute().parent / 'python'))
 
     import coppeliasim.cmdopt
-    parser = argparse.ArgumentParser(description='CoppeliaSim client.')
-    coppeliasim.cmdopt.add(parser, __file__)
+    parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
+    coppeliasim.cmdopt.add(parser)
     args = parser.parse_args()
-
+    if args.coppeliasim_library == 'default':
+        defaultLibNameBase = 'coppeliaSim'
+        if args.true_headless:
+            defaultLibNameBase = 'coppeliaSimHeadless'
+        from pathlib import Path
+        libPath = Path(__file__).absolute().parent
+        import platform
+        plat = platform.system()
+        if plat == 'Windows':
+            libPath /= defaultLibNameBase + '.dll'
+        elif plat == 'Linux':
+            libPath /= 'lib' + defaultLibNameBase + '.so'
+        elif plat == 'Darwin':
+            libPath = libPath / '..' / 'MacOS' / 'lib' + defaultLibNameBase + '.dylib'
+        args.coppeliasim_library = str(libPath)
+    
     builtins.coppeliasim_library = args.coppeliasim_library
     from coppeliasim.lib import *
 
@@ -73,7 +88,10 @@ if __name__ == '__main__':
 
     appDir = os.path.dirname(args.coppeliasim_library)
 
-    t = threading.Thread(target=simThreadFunc, args=(appDir,))
-    t.start()
-    simRunGui(options)
-    t.join()
+    if args.true_headless:
+        simThreadFunc(appDir)
+    else:
+        t = threading.Thread(target=simThreadFunc, args=(appDir,))
+        t.start()
+        simRunGui(options)
+        t.join()
