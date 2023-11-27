@@ -48,5 +48,6 @@ def getObject(name, _info=None):
     return ret
 
 def require(obj):
+    call('scriptClientBridge.require', [obj])
     o = getObject(obj)
     return o
