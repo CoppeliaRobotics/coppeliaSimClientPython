@@ -74,13 +74,13 @@ if __name__ == '__main__':
         import platform
         plat = platform.system()
         if plat == 'Windows':
-            libPath /= defaultLibNameBase + '.dll'
+            libPath /= f'{defaultLibNameBase}.dll'
         elif plat == 'Linux':
-            libPath /= 'lib' + defaultLibNameBase + '.so'
+            libPath /= f'lib{defaultLibNameBase}.so'
         elif plat == 'Darwin':
-            libPath = libPath / '..' / 'MacOS' / 'lib' + defaultLibNameBase + '.dylib'
+            libPath = libPath / '..' / 'MacOS' / f'lib{defaultLibNameBase}.dylib'
         args.coppeliasim_library = str(libPath)
-    
+
     builtins.coppeliasim_library = args.coppeliasim_library
     from coppeliasim.lib import *
 
