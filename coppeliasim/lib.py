@@ -46,6 +46,8 @@ coppeliaSimLib.simSetStringParam.argtypes = [c_int, c_char_p]
 coppeliaSimLib.simSetStringParam.restype = c_int
 coppeliaSimLib.simSetNamedStringParam.argtypes = [c_char_p, c_char_p, c_int]
 coppeliaSimLib.simSetNamedStringParam.restype = c_int
+coppeliaSimLib.simRegCallback.argtypes = [c_int, CFUNCTYPE(c_int, c_int)]
+coppeliaSimLib.simRegCallback.restype = None
 
 __all__ = []
 
