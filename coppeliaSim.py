@@ -10,6 +10,11 @@ import threading
 from pathlib import Path
 from ctypes import *
 
+# example callback (input and output args are exchanged using stack functions)
+#def testCallback(stack):
+#    print(f'testCallback: called with {stack=}')
+#    print(f'testCallback: returning 1')
+#    return 1
 
 def simStart():
     if sim.getSimulationState() == sim.simulation_stopped:
@@ -30,6 +35,10 @@ def simThreadFunc(appDir):
     import coppeliasim.bridge
 
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
+
+    # example: register a python callback that can be called by coppeliaSim or plugins
+    #testCallback_c = CFUNCTYPE(c_int, c_int)(testCallback)
+    #simRegCallback(0, testCallback_c)
 
     coppeliasim.bridge.load()
 
