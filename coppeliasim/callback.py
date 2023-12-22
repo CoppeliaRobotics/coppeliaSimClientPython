@@ -11,6 +11,7 @@ def read_stack_into_tuple(stack):
         simGetStackStringValue,
         simGetStackTableInfo,
         simGetStackInt32Value,
+        simPopStackItem,
         sim_stackitem_null,
         sim_stackitem_double,
         sim_stackitem_bool,
@@ -54,6 +55,7 @@ def read_stack_into_tuple(stack):
             value = ctypes.c_int32()
             simGetStackInt32Value(stack, ctypes.byref(value))
             tuple_data.append(value.value)
+        simPopStackItem(stack, 1)
     return tuple(tuple_data)
 
 def write_tuple_to_stack(stack, tuple_data):
