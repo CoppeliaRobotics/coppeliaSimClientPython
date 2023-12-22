@@ -48,22 +48,22 @@ def parse(args):
 
     if args.statusbar_verbosity:
         sim_stringparam_statusbarverbosity = 122
-        s = c_char_p(args.verbosity.encode('utf-8'))
+        s = c_char_p(args.statusbar_verbosity.encode('utf-8'))
         simSetStringParam(sim_stringparam_statusbarverbosity, s)
 
     if args.dlg_verbosity:
         sim_stringparam_dlgverbosity = 123
-        s = c_char_p(args.verbosity.encode('utf-8'))
+        s = c_char_p(args.dlg_verbosity.encode('utf-8'))
         simSetStringParam(sim_stringparam_dlgverbosity, s)
 
     if args.additional_addon_script_1:
         sim_stringparam_additional_addonscript1 = 11
-        s = c_char_p(args.verbosity.encode('utf-8'))
+        s = c_char_p(args.additional_addon_script_1.encode('utf-8'))
         simSetStringParam(sim_stringparam_additional_addonscript1, s)
 
-    if args.additional_addon_script_1:
+    if args.additional_addon_script_2:
         sim_stringparam_additional_addonscript2 = 12
-        s = c_char_p(args.verbosity.encode('utf-8'))
+        s = c_char_p(args.additional_addon_script_2.encode('utf-8'))
         simSetStringParam(sim_stringparam_additional_addonscript2, s)
 
     if args.app_arg:
