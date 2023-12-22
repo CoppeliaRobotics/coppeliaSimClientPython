@@ -85,5 +85,5 @@ def parse(args):
     if args.headless or args.true_headless:
         options = sim_gui_headless
     else:
-        options = sim_gui_all if args.options == -1 else args.options
+        options = 0 if args.options == -1 else args.options
     return options
