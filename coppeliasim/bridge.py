@@ -51,3 +51,11 @@ def require(obj):
     call('scriptClientBridge.require', [obj])
     o = getObject(obj)
     return o
+
+def getScriptFunctions(scriptHandle):
+    return type('', (object,), {
+        '__getattr__':
+            lambda _, func:
+                lambda *args:
+                    call('sim.callScriptFunction', (func, scriptHandle) + args)
+    })()
