@@ -41,7 +41,7 @@ def getObject(name, _info=None):
             raise ValueError('found nondict')
         if len(v) == 1 and 'func' in v:
             if f'{name}.{k}' == 'sim.getScriptFunctions':
-                setattr(ret, k, lambda scriptHandle, func=f'{name}.{k}':
+                setattr(ret, k, lambda scriptHandle:
                         type('', (object,), {
                             '__getattr__':
                                 lambda _, func:
