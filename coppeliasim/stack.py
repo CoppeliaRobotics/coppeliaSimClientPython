@@ -216,7 +216,7 @@ def write_list(stackHandle, value):
     )
     simPushTableOntoStack(stackHandle)
     for i, v in enumerate(value):
-        write_value(stackHandle, i)
+        write_value(stackHandle, i + 1)
         write_value(stackHandle, v)
         simInsertDataIntoStackTable(stackHandle)
 
