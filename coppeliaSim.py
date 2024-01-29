@@ -11,70 +11,10 @@ from pathlib import Path
 from ctypes import *
 
 
-# example callback (input and output args are exchanged using stack functions)
-#def testCallback(stack):
-#    print(f'testCallback: called with {stack=}')
-#    print(f'testCallback: returning 1')
-#    return 1
-#
-# or use the coppeliasim.callback decorator to perform automatic reading and
-# writing of common types to and from stack:
-#from coppeliasim.callback import callback
-#@callback
-#def testCallback(*args):
-#    print('testCallback called with args:', args)
-#    return 3, 'foo', {'a': 5.2, 'b': [1, 2, 3]}
-
-def simStart():
-    if sim.getSimulationState() == sim.simulation_stopped:
-        sim.startSimulation()
-
-def simStep():
-    if sim.getSimulationState() != sim.simulation_stopped:
-        t = sim.getSimulationTime()
-        while t == sim.getSimulationTime():
-            simLoop(None, 0)
-
-def simStop():
-    while sim.getSimulationState() != sim.simulation_stopped:
-        sim.stopSimulation()
-        simLoop(None, 0)
+# refer to the manual (en/coppeliaSimLibrary.htm) for customization examples
 
 def simThreadFunc(appDir):
-    import coppeliasim.bridge
-
     simInitialize(c_char_p(appDir.encode('utf-8')), 0)
-
-    # example: register a python callback that can be called by coppeliaSim or plugins
-    #testCallback_c = CFUNCTYPE(c_int, c_int)(testCallback)
-    #simRegCallback(0, testCallback_c)
-    # it can be later called by:
-    #sim.callScriptFunction('ccallback0', sim.scripttype_sandboxscript, ...)
-    # or by plugins that take normal (lua) callbacks
-
-    coppeliasim.bridge.load()
-
-    # fetch CoppeliaSim API sim-namespace functions:
-    global sim
-    sim = coppeliasim.bridge.require('sim')
-
-    v = sim.getInt32Param(sim.intparam_program_full_version)
-    version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
-    print('CoppeliaSim version is:', version)
-
-    # example: load a scene, run the simulation for 1000 steps, then quit:
-    '''
-    sim.loadScene('path/to/scene.ttt')
-    simStart()
-    for i in range(1000):
-        t = sim.getSimulationTime()
-        print(f'Simulation time: {t:.2f} [s] (simulation running synchronously to client, i.e. stepped)')
-        simStep()
-    simStop()
-    simDeinitialize()
-    '''
-
-    # example: simply run CoppeliaSim:
     while not simGetExitRequest():
         simLoop(None, 0)
     simDeinitialize()
