@@ -100,6 +100,8 @@ coppeliaSimLib.simPushDoubleOntoStack.argtypes = [c_int, c_double]
 coppeliaSimLib.simPushDoubleOntoStack.restype = c_int
 coppeliaSimLib.simPushDoubleTableOntoStack.argtypes = [c_int, POINTER(c_double), c_int]
 coppeliaSimLib.simPushDoubleTableOntoStack.restype = c_int
+coppeliaSimLib.simDebugStack.argtypes = [c_int, c_int]
+coppeliaSimLib.simDebugStack.restype = c_int
 
 __all__ = []
 

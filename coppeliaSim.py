@@ -10,11 +10,20 @@ import threading
 from pathlib import Path
 from ctypes import *
 
+
 # example callback (input and output args are exchanged using stack functions)
 #def testCallback(stack):
 #    print(f'testCallback: called with {stack=}')
 #    print(f'testCallback: returning 1')
 #    return 1
+#
+# or use the coppeliasim.callback decorator to perform automatic reading and
+# writing of common types to and from stack:
+#from coppeliasim.callback import callback
+#@callback
+#def testCallback(*args):
+#    print('testCallback called with args:', args)
+#    return 3, 'foo', {'a': 5.2, 'b': [1, 2, 3]}
 
 def simStart():
     if sim.getSimulationState() == sim.simulation_stopped:
@@ -39,6 +48,9 @@ def simThreadFunc(appDir):
     # example: register a python callback that can be called by coppeliaSim or plugins
     #testCallback_c = CFUNCTYPE(c_int, c_int)(testCallback)
     #simRegCallback(0, testCallback_c)
+    # it can be later called by:
+    #sim.callScriptFunction('ccallback0', sim.scripttype_sandboxscript, ...)
+    # or by plugins that take normal (lua) callbacks
 
     coppeliasim.bridge.load()
 
