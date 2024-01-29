@@ -2,7 +2,18 @@ import builtins
 import os
 import sys
 
-from ctypes import *
+from ctypes import cdll
+from ctypes import c_int, c_double, c_bool, c_longlong, c_ubyte
+from ctypes import c_void_p, c_char_p, POINTER
+from ctypes import CFUNCTYPE
+
+
+c_int_p = POINTER(c_int)
+c_bool_p = POINTER(c_bool)
+c_double_p = POINTER(c_double)
+c_longlong_p = POINTER(c_longlong)
+c_ubyte_p = POINTER(c_ubyte)
+c_callbackfn_p = CFUNCTYPE(c_int, c_int)
 
 
 if not os.path.isfile(builtins.coppeliasim_library):
@@ -32,7 +43,7 @@ coppeliaSimLib.simPushStringOntoStack.argtypes = [c_int, c_char_p, c_int]
 coppeliaSimLib.simPushStringOntoStack.restype = c_int
 coppeliaSimLib.simCallScriptFunctionEx.argtypes = [c_int, c_char_p, c_int]
 coppeliaSimLib.simCallScriptFunctionEx.restype = c_int
-coppeliaSimLib.simGetStackStringValue.argtypes = [c_int, POINTER(c_int)]
+coppeliaSimLib.simGetStackStringValue.argtypes = [c_int, c_int_p]
 coppeliaSimLib.simGetStackStringValue.restype = c_void_p
 coppeliaSimLib.simInitialize.argtypes = [c_char_p, c_int]
 coppeliaSimLib.simInitialize.restype = c_int
@@ -46,7 +57,7 @@ coppeliaSimLib.simSetStringParam.argtypes = [c_int, c_char_p]
 coppeliaSimLib.simSetStringParam.restype = c_int
 coppeliaSimLib.simSetNamedStringParam.argtypes = [c_char_p, c_char_p, c_int]
 coppeliaSimLib.simSetNamedStringParam.restype = c_int
-coppeliaSimLib.simRegCallback.argtypes = [c_int, CFUNCTYPE(c_int, c_int)]
+coppeliaSimLib.simRegCallback.argtypes = [c_int, c_callbackfn_p]
 coppeliaSimLib.simRegCallback.restype = None
 coppeliaSimLib.simCopyStack.argtypes = [c_int]
 coppeliaSimLib.simCopyStack.restype = c_int
@@ -58,11 +69,11 @@ coppeliaSimLib.simPushInt32OntoStack.argtypes = [c_int, c_int]
 coppeliaSimLib.simPushInt32OntoStack.restype = c_int
 coppeliaSimLib.simPushInt64OntoStack.argtypes = [c_int, c_longlong]
 coppeliaSimLib.simPushInt64OntoStack.restype = c_int
-coppeliaSimLib.simPushUInt8TableOntoStack.argtypes = [c_int, POINTER(c_ubyte), c_int]
+coppeliaSimLib.simPushUInt8TableOntoStack.argtypes = [c_int, c_ubyte_p, c_int]
 coppeliaSimLib.simPushUInt8TableOntoStack.restype = c_int
-coppeliaSimLib.simPushInt32TableOntoStack.argtypes = [c_int, POINTER(c_int), c_int]
+coppeliaSimLib.simPushInt32TableOntoStack.argtypes = [c_int, c_int_p, c_int]
 coppeliaSimLib.simPushInt32TableOntoStack.restype = c_int
-coppeliaSimLib.simPushInt64TableOntoStack.argtypes = [c_int, POINTER(c_longlong), c_int]
+coppeliaSimLib.simPushInt64TableOntoStack.argtypes = [c_int, c_longlong_p, c_int]
 coppeliaSimLib.simPushInt64TableOntoStack.restype = c_int
 coppeliaSimLib.simPushTableOntoStack.argtypes = [c_int]
 coppeliaSimLib.simPushTableOntoStack.restype = c_int
@@ -76,29 +87,29 @@ coppeliaSimLib.simMoveStackItemToTop.argtypes = [c_int, c_int]
 coppeliaSimLib.simMoveStackItemToTop.restype = c_int
 coppeliaSimLib.simGetStackItemType.argtypes = [c_int, c_int]
 coppeliaSimLib.simGetStackItemType.restype = c_int
-coppeliaSimLib.simGetStackBoolValue.argtypes = [c_int, POINTER(c_bool)]
+coppeliaSimLib.simGetStackBoolValue.argtypes = [c_int, c_bool_p]
 coppeliaSimLib.simGetStackBoolValue.restype = c_int
-coppeliaSimLib.simGetStackInt32Value.argtypes = [c_int, POINTER(c_int)]
+coppeliaSimLib.simGetStackInt32Value.argtypes = [c_int, c_int_p]
 coppeliaSimLib.simGetStackInt32Value.restype = c_int
-coppeliaSimLib.simGetStackInt64Value.argtypes = [c_int, POINTER(c_longlong)]
+coppeliaSimLib.simGetStackInt64Value.argtypes = [c_int, c_longlong_p]
 coppeliaSimLib.simGetStackInt64Value.restype = c_int
 coppeliaSimLib.simGetStackTableInfo.argtypes = [c_int, c_int]
 coppeliaSimLib.simGetStackTableInfo.restype = c_int
 coppeliaSimLib.simGetStackUInt8Table.argtypes = [c_int, c_char_p, c_int]
 coppeliaSimLib.simGetStackUInt8Table.restype = c_int
-coppeliaSimLib.simGetStackInt32Table.argtypes = [c_int, POINTER(c_int), c_int]
+coppeliaSimLib.simGetStackInt32Table.argtypes = [c_int, c_int_p, c_int]
 coppeliaSimLib.simGetStackInt32Table.restype = c_int
-coppeliaSimLib.simGetStackInt64Table.argtypes = [c_int, POINTER(c_longlong), c_int]
+coppeliaSimLib.simGetStackInt64Table.argtypes = [c_int, c_longlong_p, c_int]
 coppeliaSimLib.simGetStackInt64Table.restype = c_int
 coppeliaSimLib.simUnfoldStackTable.argtypes = [c_int]
 coppeliaSimLib.simUnfoldStackTable.restype = c_int
-coppeliaSimLib.simGetStackDoubleValue.argtypes = [c_int, POINTER(c_double)]
+coppeliaSimLib.simGetStackDoubleValue.argtypes = [c_int, c_double_p]
 coppeliaSimLib.simGetStackDoubleValue.restype = c_int
-coppeliaSimLib.simGetStackDoubleTable.argtypes = [c_int, POINTER(c_double), c_int]
+coppeliaSimLib.simGetStackDoubleTable.argtypes = [c_int, c_double_p, c_int]
 coppeliaSimLib.simGetStackDoubleTable.restype = c_int
 coppeliaSimLib.simPushDoubleOntoStack.argtypes = [c_int, c_double]
 coppeliaSimLib.simPushDoubleOntoStack.restype = c_int
-coppeliaSimLib.simPushDoubleTableOntoStack.argtypes = [c_int, POINTER(c_double), c_int]
+coppeliaSimLib.simPushDoubleTableOntoStack.argtypes = [c_int, c_double_p, c_int]
 coppeliaSimLib.simPushDoubleTableOntoStack.restype = c_int
 coppeliaSimLib.simDebugStack.argtypes = [c_int, c_int]
 coppeliaSimLib.simDebugStack.restype = c_int
