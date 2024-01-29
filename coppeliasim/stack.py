@@ -13,6 +13,7 @@ def read_null(stackHandle):
     else:
         raise RuntimeError('expected nil')
 
+
 def read_bool(stackHandle):
     from coppeliasim.lib import (
         simGetStackBoolValue,
@@ -24,6 +25,7 @@ def read_bool(stackHandle):
         return value.value
     else:
         raise RuntimeError('expected bool')
+
 
 def read_int(stackHandle):
     from coppeliasim.lib import (
@@ -37,6 +39,7 @@ def read_int(stackHandle):
     else:
         raise RuntimeError('expected int')
 
+
 def read_long(stackHandle):
     from coppeliasim.lib import (
         simGetStackInt64Value,
@@ -49,6 +52,7 @@ def read_long(stackHandle):
     else:
         raise RuntimeError('expected int64')
 
+
 def read_double(stackHandle):
     from coppeliasim.lib import (
         simGetStackDoubleValue,
@@ -60,6 +64,7 @@ def read_double(stackHandle):
         return value.value
     else:
         raise RuntimeError('expected double')
+
 
 def read_string(stackHandle):
     from coppeliasim.lib import (
@@ -74,6 +79,7 @@ def read_string(stackHandle):
     value = string_value.decode('utf-8')
     simReleaseBuffer(string_ptr)
     return value
+
 
 def read_dict(stackHandle):
     from coppeliasim.lib import (
@@ -98,6 +104,7 @@ def read_dict(stackHandle):
         d[k] = read_value(stackHandle)
     return d
 
+
 def read_list(stackHandle):
     from coppeliasim.lib import (
         simGetStackSize,
@@ -115,6 +122,7 @@ def read_list(stackHandle):
         l.append(read_value(stackHandle))
     return l
 
+
 def read_table(stackHandle):
     from coppeliasim.lib import (
         simGetStackTableInfo,
@@ -126,6 +134,7 @@ def read_table(stackHandle):
         return read_list(stackHandle)
     elif sz == sim_stack_table_map or sz == sim_stack_table_empty:
         return read_dict(stackHandle)
+
 
 def read_value(stackHandle):
     from coppeliasim.lib import (
@@ -154,6 +163,7 @@ def read_value(stackHandle):
         raise RuntimeError(f'unexpected stack item type: {item_type}')
     return value
 
+
 def read(stackHandle):
     from coppeliasim.lib import (
         simGetStackSize,
@@ -168,11 +178,13 @@ def read(stackHandle):
     simPopStackItem(stackHandle, 0) # clear all
     return tuple(tuple_data)
 
+
 def write_null(stackHandle, value):
     from coppeliasim.lib import (
         simPushNullOntoStack,
     )
     simPushNullOntoStack(stackHandle)
+
 
 def write_double(stackHandle, value):
     from coppeliasim.lib import (
@@ -180,11 +192,13 @@ def write_double(stackHandle, value):
     )
     simPushDoubleOntoStack(stackHandle, value)
 
+
 def write_bool(stackHandle, value):
     from coppeliasim.lib import (
         simPushBoolOntoStack,
     )
     simPushBoolOntoStack(stackHandle, value)
+
 
 def write_int(stackHandle, value):
     from coppeliasim.lib import (
@@ -192,11 +206,13 @@ def write_int(stackHandle, value):
     )
     simPushInt32OntoStack(stackHandle, value)
 
+
 def write_string(stackHandle, value):
     from coppeliasim.lib import (
         simPushStringOntoStack,
     )
     simPushStringOntoStack(stackHandle, value.encode('utf-8'), len(value))
+
 
 def write_dict(stackHandle, value):
     from coppeliasim.lib import (
@@ -209,6 +225,7 @@ def write_dict(stackHandle, value):
         write_value(stackHandle, v)
         simInsertDataIntoStackTable(stackHandle)
 
+
 def write_list(stackHandle, value):
     from coppeliasim.lib import (
         simPushTableOntoStack,
@@ -219,6 +236,7 @@ def write_list(stackHandle, value):
         write_value(stackHandle, i + 1)
         write_value(stackHandle, v)
         simInsertDataIntoStackTable(stackHandle)
+
 
 def write_value(stackHandle, value):
     if value is None:
@@ -238,6 +256,12 @@ def write_value(stackHandle, value):
     else:
         raise RuntimeError(f'unexpected type: {type(value)}')
 
+
+def write(stackHandle, tuple_data):
+    for item in tuple_data:
+        write_value(stackHandle, item)
+
+
 def debug(stackHandle, info = None):
     from coppeliasim.lib import (
         simGetStackSize,
@@ -250,7 +274,3 @@ def debug(stackHandle, info = None):
     for i in range(simGetStackSize(stackHandle)):
         simDebugStack(stackHandle, i)
     print('#' * 70)
-
-def write(stackHandle, tuple_data):
-    for item in tuple_data:
-        write_value(stackHandle, item)
