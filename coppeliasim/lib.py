@@ -148,6 +148,17 @@ const.sim_scripttype_addonscript = 2
 const.sim_scripttype_customizationscript = 6
 const.sim_scripttype_sandboxscript = 8
 
+const.sim_gui_all = 0x0ffff
+const.sim_gui_headless = 0x10000
+
+const.sim_stringparam_app_arg1 = 2
+const.sim_stringparam_additional_addonscript1 = 11
+const.sim_stringparam_additional_addonscript2 = 12
+const.sim_stringparam_verbosity = 121
+const.sim_stringparam_statusbarverbosity = 122
+const.sim_stringparam_dlgverbosity = 123
+const.sim_stringparam_startupscriptstring = 125
+
 for name in dir(const):
     if name.startswith('sim'):
         f = getattr(const, name)
