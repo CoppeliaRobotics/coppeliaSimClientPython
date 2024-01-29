@@ -8,6 +8,7 @@ from ctypes import c_void_p, c_char_p, POINTER
 from ctypes import CFUNCTYPE
 
 
+c_void = None
 c_int_p = POINTER(c_int)
 c_bool_p = POINTER(c_bool)
 c_double_p = POINTER(c_double)
@@ -32,7 +33,7 @@ if plat == 'Darwin':
 
 coppeliaSimLib = cdll.LoadLibrary(builtins.coppeliasim_library)
 coppeliaSimLib.simRunGui.argtypes = [c_int]
-coppeliaSimLib.simRunGui.restype = None
+coppeliaSimLib.simRunGui.restype = c_void
 coppeliaSimLib.simCreateStack.argtypes = []
 coppeliaSimLib.simCreateStack.restype = c_int
 coppeliaSimLib.simReleaseStack.argtypes = [c_int]
@@ -58,7 +59,7 @@ coppeliaSimLib.simSetStringParam.restype = c_int
 coppeliaSimLib.simSetNamedStringParam.argtypes = [c_char_p, c_char_p, c_int]
 coppeliaSimLib.simSetNamedStringParam.restype = c_int
 coppeliaSimLib.simRegCallback.argtypes = [c_int, c_callbackfn_p]
-coppeliaSimLib.simRegCallback.restype = None
+coppeliaSimLib.simRegCallback.restype = c_void
 coppeliaSimLib.simCopyStack.argtypes = [c_int]
 coppeliaSimLib.simCopyStack.restype = c_int
 coppeliaSimLib.simPushNullOntoStack.argtypes = [c_int]
