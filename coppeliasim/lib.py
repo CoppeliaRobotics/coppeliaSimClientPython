@@ -130,6 +130,12 @@ const.sim_stack_table_not_table = -3
 const.sim_stack_table_map = -2
 const.sim_stack_table_empty = 0
 
+const.sim_scripttype_mainscript = 0
+const.sim_scripttype_childscript = 1
+const.sim_scripttype_addonscript = 2
+const.sim_scripttype_customizationscript = 6
+const.sim_scripttype_sandboxscript = 8
+
 for name in dir(const):
     if name.startswith('sim'):
         f = getattr(const, name)
