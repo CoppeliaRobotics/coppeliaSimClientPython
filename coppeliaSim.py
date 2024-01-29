@@ -3,21 +3,32 @@
 
 import argparse
 import builtins
+import ctypes
 import os
 import sys
 import threading
 
 from pathlib import Path
-from ctypes import *
 
 
 # refer to the manual (en/coppeliaSimLibrary.htm) for customization examples
 
+
 def simThreadFunc(appDir):
-    simInitialize(c_char_p(appDir.encode('utf-8')), 0)
+    from coppeliasim.lib import (
+        simInitialize,
+        simLoop,
+        simDeinitialize,
+        simGetExitRequest,
+    )
+
+    simInitialize(ctypes.c_char_p(appDir.encode('utf-8')), 0)
+
     while not simGetExitRequest():
         simLoop(None, 0)
+
     simDeinitialize()
+
 
 if __name__ == '__main__':
     sys.path.append(str(Path(__file__).absolute().parent / 'python'))
@@ -39,11 +50,10 @@ if __name__ == '__main__':
         elif plat == 'Linux':
             libPath /= f'lib{defaultLibNameBase}.so'
         elif plat == 'Darwin':
-            libPath = libPath / '..' / 'MacOS' / f'lib{defaultLibNameBase}.dylib'
+            libPath /= f'../MacOS/lib{defaultLibNameBase}.dylib'
         args.coppeliasim_library = str(libPath)
 
     builtins.coppeliasim_library = args.coppeliasim_library
-    from coppeliasim.lib import *
 
     options = coppeliasim.cmdopt.parse(args)
 
@@ -52,6 +62,7 @@ if __name__ == '__main__':
     if args.true_headless:
         simThreadFunc(appDir)
     else:
+        from coppeliasim.lib import simRunGui
         t = threading.Thread(target=simThreadFunc, args=(appDir,))
         t.start()
         simRunGui(options)

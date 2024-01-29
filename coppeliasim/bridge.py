@@ -1,4 +1,4 @@
-from ctypes import *
+import ctypes
 
 
 def load():
@@ -16,7 +16,7 @@ def call(func, args):
     stackHandle = simCreateStack()
     stack.write(stackHandle, args)
     s = sim_scripttype_sandboxscript
-    f = c_char_p(f'{func}@lua'.encode('ascii'))
+    f = ctypes.c_char_p(f'{func}@lua'.encode('ascii'))
     r = simCallScriptFunctionEx(s, f, stackHandle)
     if r == -1:
         if False:

@@ -1,10 +1,6 @@
-import ctypes
-
-from . import stack
-
-
 def callback(f):
     def wrapper(stackHandle):
+        import coppeliasim.stack as stack
         try:
             inArgs = stack.read(stackHandle)
             outArgs = f(*inArgs)
