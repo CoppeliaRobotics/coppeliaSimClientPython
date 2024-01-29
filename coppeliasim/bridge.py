@@ -40,6 +40,15 @@ def getObject(name, _info=None):
         if not isinstance(v, dict):
             raise ValueError('found nondict')
         if len(v) == 1 and 'func' in v:
+            if f'{name}.{k}' == 'sim.getScriptFunctions':
+                setattr(ret, k, lambda scriptHandle, func=f'{name}.{k}':
+                        type('', (object,), {
+                            '__getattr__':
+                                lambda _, func:
+                                    lambda *args:
+                                        call('sim.callScriptFunction', (func, scriptHandle) + args)
+                        })())
+                continue
             setattr(ret, k, lambda *a, func=f'{name}.{k}': call(func, a))
         elif len(v) == 1 and 'const' in v:
             setattr(ret, k, v['const'])
@@ -52,12 +61,3 @@ def require(obj):
     call('scriptClientBridge.require', [obj])
     o = getObject(obj)
     return o
-
-
-def getScriptFunctions(scriptHandle):
-    return type('', (object,), {
-        '__getattr__':
-            lambda _, func:
-                lambda *args:
-                    call('sim.callScriptFunction', (func, scriptHandle) + args)
-    })()
