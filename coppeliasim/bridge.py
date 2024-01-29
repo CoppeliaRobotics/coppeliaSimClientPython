@@ -12,7 +12,21 @@ def load():
     r = simCallScriptFunctionEx(8, c_char_p(__f('require').encode('ascii')), stack)
     simReleaseStack(stack)
 
-def call(func, args):
+def call_direct(func, args):
+    stackHandle = simCreateStack()
+    import coppeliasim.stack as stack
+    stack.write(stackHandle, args)
+    r = simCallScriptFunctionEx(8, c_char_p(func.encode('ascii')), stackHandle)
+    if r == -1:
+        raise Exception(f'simCallScriptFunctionEx(8, {func!r}, {args!r}) returned -1')
+    ret = stack.read(stackHandle)
+    simReleaseStack(stackHandle)
+    if len(ret) == 1:
+        return ret[0]
+    elif len(ret) > 1:
+        return ret
+
+def call_cbor(func, args):
     stack = simCreateStack()
     import cbor
     b = cbor.dumps({'func': func, 'args': args})
@@ -31,6 +45,8 @@ def call(func, args):
             return tuple(ret)
     else:
         raise Exception(o['error'])
+
+call = call_cbor
 
 def getObject(name, _info=None):
     ret = type(name, (), {})
