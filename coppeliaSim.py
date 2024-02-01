@@ -20,9 +20,18 @@ def simThreadFunc(appDir):
         simLoop,
         simDeinitialize,
         simGetExitRequest,
+        simGetStringParam,
+        simReleaseBuffer,
+        sim_stringparam_pythondir,
     )
 
     simInitialize(ctypes.c_char_p(appDir.encode('utf-8')), 0)
+
+    import sys
+    pythonDirPtr = simGetStringParam(sim_stringparam_pythondir)
+    pythonDir = ctypes.string_at(pythonDirPtr).decode('utf-8')
+    #simReleaseBuffer(pythonDirPtr)  # XXX: crash
+    sys.path.append(pythonDir)
 
     while not simGetExitRequest():
         simLoop(None, 0)
@@ -31,8 +40,6 @@ def simThreadFunc(appDir):
 
 
 if __name__ == '__main__':
-    sys.path.append(str(Path(__file__).absolute().parent / 'python'))
-
     import coppeliasim.cmdopt
     parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
     coppeliasim.cmdopt.add(parser)
