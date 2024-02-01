@@ -114,6 +114,8 @@ coppeliaSimLib.simPushDoubleTableOntoStack.argtypes = [c_int, c_double_p, c_int]
 coppeliaSimLib.simPushDoubleTableOntoStack.restype = c_int
 coppeliaSimLib.simDebugStack.argtypes = [c_int, c_int]
 coppeliaSimLib.simDebugStack.restype = c_int
+coppeliaSimLib.simGetStringParam.argtypes = [c_int]
+coppeliaSimLib.simGetStringParam.restype = c_char_p
 
 __all__ = []
 
@@ -158,6 +160,8 @@ const.sim_stringparam_verbosity = 121
 const.sim_stringparam_statusbarverbosity = 122
 const.sim_stringparam_dlgverbosity = 123
 const.sim_stringparam_startupscriptstring = 125
+
+const.sim_stringparam_pythondir = 137
 
 for name in dir(const):
     if name.startswith('sim'):
