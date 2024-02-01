@@ -22,16 +22,19 @@ def load():
 
 @functools.cache
 def getTypeHints(func):
-    import calltip
+    from calltip import FuncDef, VarArgs
     c = call('sim.getApiInfo', [-1, func], (('int', 'string'), ('string')))
     if not c:
         return (None, None)
     c = c.split('\n')[0]
-    fd = calltip.FuncDef.from_calltip(c)
-    return (
-        tuple(item.type for item in fd.in_args),
-        tuple(item.type for item in fd.out_args),
-    )
+    fd = FuncDef.from_calltip(c)
+    inArgs = list(fd.in_args)
+    if isinstance(inArgs[-1], VarArgs):
+        inArgs.pop()
+    outArgs = list(fd.out_args)
+    if isinstance(outArgs[-1], VarArgs):
+        outArgs.pop()
+    return tuple(tuple(item.type for item in x) for x in (inArgs, outArgs))
 
 
 def call(func, args, typeHints=None):
