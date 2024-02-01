@@ -8,11 +8,19 @@ def load():
 
 @functools.cache
 def getTypeHints(func):
-    # note: set PYTHONPATH=/path/to/programming/zmqRemoteApi/tools
     try:
         import calltip
     except ModuleNotFoundError:
-        return (None, None)
+        from pathlib import Path
+        import sys
+        zmqRemoteApiToolsPath = str(Path(__file__).parent.parent.parent / 'zmqRemoteApi' / 'tools')
+        if zmqRemoteApiToolsPath not in sys.path:
+            sys.path.append(zmqRemoteApiToolsPath)
+        try:
+            import calltip
+        except ModuleNotFoundError:
+            print('warning: zmqRemoteApi.tools.calltip module not found (set PYTHONPATH to /path/to/zmqRemoteApi/tools to fix this)')
+            return (None, None)
     c = call('sim.getApiInfo', [-1, func], (('int', 'string'), ('string')))
     if not c:
         return (None, None)
