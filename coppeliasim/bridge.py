@@ -29,10 +29,10 @@ def getTypeHints(func):
     c = c.split('\n')[0]
     fd = FuncDef.from_calltip(c)
     inArgs = list(fd.in_args)
-    if isinstance(inArgs[-1], VarArgs):
+    if inArgs and isinstance(inArgs[-1], VarArgs):
         inArgs.pop()
     outArgs = list(fd.out_args)
-    if isinstance(outArgs[-1], VarArgs):
+    if outArgs and isinstance(outArgs[-1], VarArgs):
         outArgs.pop()
     return tuple(tuple(item.type for item in x) for x in (inArgs, outArgs))
 
