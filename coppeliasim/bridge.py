@@ -13,7 +13,8 @@ def load():
     pythonDirPtr = simGetStringParam(sim_stringparam_pythondir)
     pythonDir = ctypes.string_at(pythonDirPtr).decode('utf-8')
     simReleaseBuffer(pythonDirPtr)
-    sys.path.append(pythonDir)
+    if pythonDir not in sys.path:
+        sys.path.append(pythonDir)
 
     # load lua functions for call(), getObject(), etc...:
     call('require', ('scriptClientBridge',))
