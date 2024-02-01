@@ -66,7 +66,7 @@ def read_double(stackHandle):
         raise RuntimeError('expected double')
 
 
-def read_string(stackHandle):
+def read_string(stackHandle, encoding=None):
     from coppeliasim.lib import (
         simGetStackStringValue,
         simReleaseBuffer,
@@ -74,9 +74,10 @@ def read_string(stackHandle):
     )
     string_size = ctypes.c_int()
     string_ptr = simGetStackStringValue(stackHandle, ctypes.byref(string_size))
-    string_value = ctypes.string_at(string_ptr, string_size.value)
+    value = ctypes.string_at(string_ptr, string_size.value)
     simPopStackItem(stackHandle, 1)
-    value = string_value.decode('utf-8')
+    if encoding:
+        value = value.decode(encoding)
     simReleaseBuffer(string_ptr)
     return value
 
@@ -111,7 +112,7 @@ def read_list(stackHandle):
         simUnfoldStackTable,
         simMoveStackItemToTop,
     )
-    l = list()
+    lst = list()
     oldsz = simGetStackSize(stackHandle)
     simUnfoldStackTable(stackHandle)
     n = (simGetStackSize(stackHandle) - oldsz + 1) // 2
@@ -119,24 +120,24 @@ def read_list(stackHandle):
         simMoveStackItemToTop(stackHandle, oldsz - 1)
         read_value(stackHandle)
         simMoveStackItemToTop(stackHandle, oldsz - 1)
-        l.append(read_value(stackHandle))
-    return l
+        lst.append(read_value(stackHandle))
+    return lst
 
 
-def read_table(stackHandle):
+def read_table(stackHandle, typeHint=None):
     from coppeliasim.lib import (
         simGetStackTableInfo,
         sim_stack_table_map,
         sim_stack_table_empty,
     )
     sz = simGetStackTableInfo(stackHandle, 0)
-    if sz >= 0:
+    if typeHint == 'list' or sz >= 0:
         return read_list(stackHandle)
-    elif sz == sim_stack_table_map or sz == sim_stack_table_empty:
+    elif typeHint == 'dict' or sz in (sim_stack_table_map, sim_stack_table_empty):
         return read_dict(stackHandle)
 
 
-def read_value(stackHandle):
+def read_value(stackHandle, typeHint=None):
     from coppeliasim.lib import (
         simGetStackItemType,
         sim_stackitem_null,
@@ -146,25 +147,38 @@ def read_value(stackHandle):
         sim_stackitem_table,
         sim_stackitem_integer,
     )
-    item_type = simGetStackItemType(stackHandle, -1)
-    if item_type == sim_stackitem_null:
-        value = read_null(stackHandle)
-    elif item_type == sim_stackitem_double:
-        value = read_double(stackHandle)
-    elif item_type == sim_stackitem_bool:
-        value = read_bool(stackHandle)
-    elif item_type == sim_stackitem_string:
-        value = read_string(stackHandle)
-    elif item_type == sim_stackitem_table:
-        value = read_table(stackHandle)
-    elif item_type == sim_stackitem_integer:
-        value = read_long(stackHandle)
-    else:
-        raise RuntimeError(f'unexpected stack item type: {item_type}')
-    return value
+    match typeHint:
+        case 'null':
+            return read_null(stackHandle)
+        case 'float' | 'double':
+            return read_double(stackHandle)
+        case 'bool':
+            return read_bool(stackHandle)
+        case 'string':
+            return read_string(stackHandle, encoding='utf-8')
+        case 'buffer':
+            return read_string(stackHandle, encoding=None)
+        case 'table' | 'list' | 'dict':
+            return read_table(stackHandle, typeHint)
+        case 'int' | 'long':
+            return read_long(stackHandle)
+    itemType = simGetStackItemType(stackHandle, -1)
+    if itemType == sim_stackitem_null:
+        return read_null(stackHandle)
+    if itemType == sim_stackitem_double:
+        return read_double(stackHandle)
+    if itemType == sim_stackitem_bool:
+        return read_bool(stackHandle)
+    if itemType == sim_stackitem_string:
+        return read_string(stackHandle, encoding='utf-8')
+    if itemType == sim_stackitem_table:
+        return read_table(stackHandle, typeHint)
+    if itemType == sim_stackitem_integer:
+        return read_long(stackHandle)
+    raise RuntimeError(f'unexpected stack item type: {itemType} ({typeHint=})')
 
 
-def read(stackHandle):
+def read(stackHandle, typeHints=None):
     from coppeliasim.lib import (
         simGetStackSize,
         simMoveStackItemToTop,
@@ -174,8 +188,12 @@ def read(stackHandle):
     tuple_data = []
     for i in range(stack_size):
         simMoveStackItemToTop(stackHandle, 0)
-        tuple_data.append(read_value(stackHandle))
-    simPopStackItem(stackHandle, 0) # clear all
+        if typeHints and len(typeHints) > i:
+            value = read_value(stackHandle, typeHints[i])
+        else:
+            value = read_value(stackHandle)
+        tuple_data.append(value)
+    simPopStackItem(stackHandle, 0)  # clear all
     return tuple(tuple_data)
 
 
@@ -207,11 +225,20 @@ def write_int(stackHandle, value):
     simPushInt32OntoStack(stackHandle, value)
 
 
-def write_string(stackHandle, value):
+def write_long(stackHandle, value):
+    from coppeliasim.lib import (
+        simPushInt64OntoStack,
+    )
+    simPushInt64OntoStack(stackHandle, value)
+
+
+def write_string(stackHandle, value, encoding='utf-8'):
     from coppeliasim.lib import (
         simPushStringOntoStack,
     )
-    simPushStringOntoStack(stackHandle, value.encode('utf-8'), len(value))
+    if encoding:
+        value = value.encode(encoding)
+    simPushStringOntoStack(stackHandle, value, len(value))
 
 
 def write_dict(stackHandle, value):
@@ -238,31 +265,52 @@ def write_list(stackHandle, value):
         simInsertDataIntoStackTable(stackHandle)
 
 
-def write_value(stackHandle, value):
+def write_value(stackHandle, value, typeHint=None):
+    match typeHint:
+        case 'null':
+            return write_null(stackHandle, value)
+        case 'float' | 'double':
+            return write_double(stackHandle, value)
+        case 'bool':
+            return write_bool(stackHandle, value)
+        case 'int' | 'long':
+            return write_long(stackHandle, value)
+        case 'buffer':
+            return write_string(stackHandle, value, encoding=None)
+        case 'string':
+            return write_string(stackHandle, value, encoding='utf-8')
+        case 'dict':
+            return write_dict(stackHandle, value)
+        case 'list':
+            return write_list(stackHandle, value)
     if value is None:
-        write_null(stackHandle, value)
+        return write_null(stackHandle, value)
     elif isinstance(value, float):
-        write_double(stackHandle, value)
+        return write_double(stackHandle, value)
     elif isinstance(value, bool):
-        write_bool(stackHandle, value)
+        return write_bool(stackHandle, value)
     elif isinstance(value, int):
-        write_int(stackHandle, value)
+        return write_long(stackHandle, value)
+    elif isinstance(value, bytes):
+        return write_string(stackHandle, value, encoding=None)
     elif isinstance(value, str):
-        write_string(stackHandle, value)
+        return write_string(stackHandle, value, encoding='utf-8')
     elif isinstance(value, dict):
-        write_dict(stackHandle, value)
+        return write_dict(stackHandle, value)
     elif isinstance(value, list):
-        write_list(stackHandle, value)
-    else:
-        raise RuntimeError(f'unexpected type: {type(value)}')
+        return write_list(stackHandle, value)
+    raise RuntimeError(f'unexpected type: {type(value)} ({typeHint=})')
 
 
-def write(stackHandle, tuple_data):
-    for item in tuple_data:
-        write_value(stackHandle, item)
+def write(stackHandle, tuple_data, typeHints=None):
+    for i, value in enumerate(tuple_data):
+        if typeHints and len(typeHints) > i:
+            write_value(stackHandle, value, typeHints[i])
+        else:
+            write_value(stackHandle, value)
 
 
-def debug(stackHandle, info = None):
+def debug(stackHandle, info=None):
     from coppeliasim.lib import (
         simGetStackSize,
         simDebugStack,
