@@ -77,7 +77,10 @@ def read_string(stackHandle, encoding=None):
     value = ctypes.string_at(string_ptr, string_size.value)
     simPopStackItem(stackHandle, 1)
     if encoding:
-        value = value.decode(encoding)
+        try:
+            value = value.decode(encoding)
+        except UnicodeDecodeError:
+            pass
     simReleaseBuffer(string_ptr)
     return value
 
