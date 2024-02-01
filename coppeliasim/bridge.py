@@ -2,25 +2,47 @@ import ctypes
 import functools
 
 
+def importCalltipModule():
+    # calltip module import magic:
+    try:
+        import calltip
+        return calltip
+    except ModuleNotFoundError:
+        from pathlib import Path
+
+        moduleDir = Path(__file__).parent  # 'coppeliasim' python module
+        p = []
+
+        # when used from the coppeliaSimClientPython dir inside programming/:
+        programmingDir = moduleDir.parent.parent
+        p.append(programmingDir / 'include' / 'python')
+
+        # when used from the installed <coppeliaSim>/python/ dir:
+        resourcesDir = moduleDir.parent.parent
+        p.append(resourcesDir / 'programming' / 'include' / 'python')
+
+        # if COPPELIASIM_ROOT_DIR is defined:
+        import os
+        if rootDir := os.environ.get('COPPELIASIM_ROOT_DIR'):
+            p.append(Path(rootDir) / 'programming' / 'include' / 'python')
+
+        import sys
+        for path in p:
+            if (path / 'calltip.py').is_file():
+                sys.path.append(str(path))
+                break
+
+        import calltip
+        return calltip
+
+
 def load():
     call('require', ('scriptClientBridge',))
 
 
 @functools.cache
 def getTypeHints(func):
-    try:
-        import calltip
-    except ModuleNotFoundError:
-        from pathlib import Path
-        import sys
-        zmqRemoteApiToolsPath = str(Path(__file__).parent.parent.parent / 'zmqRemoteApi' / 'tools')
-        if zmqRemoteApiToolsPath not in sys.path:
-            sys.path.append(zmqRemoteApiToolsPath)
-        try:
-            import calltip
-        except ModuleNotFoundError:
-            print('warning: zmqRemoteApi.tools.calltip module not found (set PYTHONPATH to /path/to/zmqRemoteApi/tools to fix this)')
-            return (None, None)
+    calltip = importCalltipModule()
     c = call('sim.getApiInfo', [-1, func], (('int', 'string'), ('string')))
     if not c:
         return (None, None)
