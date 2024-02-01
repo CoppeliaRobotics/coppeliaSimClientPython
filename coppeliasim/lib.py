@@ -115,7 +115,7 @@ coppeliaSimLib.simPushDoubleTableOntoStack.restype = c_int
 coppeliaSimLib.simDebugStack.argtypes = [c_int, c_int]
 coppeliaSimLib.simDebugStack.restype = c_int
 coppeliaSimLib.simGetStringParam.argtypes = [c_int]
-coppeliaSimLib.simGetStringParam.restype = c_char_p
+coppeliaSimLib.simGetStringParam.restype = c_void_p
 
 __all__ = []
 

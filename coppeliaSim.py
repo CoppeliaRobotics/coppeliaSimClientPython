@@ -30,7 +30,7 @@ def simThreadFunc(appDir):
     import sys
     pythonDirPtr = simGetStringParam(sim_stringparam_pythondir)
     pythonDir = ctypes.string_at(pythonDirPtr).decode('utf-8')
-    #simReleaseBuffer(pythonDirPtr)  # XXX: crash
+    simReleaseBuffer(pythonDirPtr)
     sys.path.append(pythonDir)
 
     while not simGetExitRequest():
