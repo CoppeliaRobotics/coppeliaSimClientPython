@@ -27,12 +27,6 @@ def simThreadFunc(appDir):
 
     simInitialize(ctypes.c_char_p(appDir.encode('utf-8')), 0)
 
-    import sys
-    pythonDirPtr = simGetStringParam(sim_stringparam_pythondir)
-    pythonDir = ctypes.string_at(pythonDirPtr).decode('utf-8')
-    simReleaseBuffer(pythonDirPtr)
-    sys.path.append(pythonDir)
-
     while not simGetExitRequest():
         simLoop(None, 0)
 

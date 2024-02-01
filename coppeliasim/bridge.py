@@ -1,48 +1,27 @@
 import ctypes
 import functools
-
-
-def importCalltipModule():
-    # calltip module import magic:
-    try:
-        import calltip
-        return calltip
-    except ModuleNotFoundError:
-        from pathlib import Path
-
-        moduleDir = Path(__file__).parent  # 'coppeliasim' python module
-        p = []
-
-        # when used from the coppeliaSimClientPython dir inside programming/:
-        programmingDir = moduleDir.parent.parent
-        p.append(programmingDir / 'include' / 'python')
-
-        # when used from the installed <coppeliaSim>/python/ dir:
-        resourcesDir = moduleDir.parent.parent
-        p.append(resourcesDir / 'programming' / 'include' / 'python')
-
-        # if COPPELIASIM_ROOT_DIR is defined:
-        import os
-        if rootDir := os.environ.get('COPPELIASIM_ROOT_DIR'):
-            p.append(Path(rootDir) / 'programming' / 'include' / 'python')
-
-        import sys
-        for path in p:
-            if (path / 'calltip.py').is_file():
-                sys.path.append(str(path))
-                break
-
-        import calltip
-        return calltip
+import sys
 
 
 def load():
+    # add coppeliaSim's pythondir to sys.path:
+    from coppeliasim.lib import (
+        simGetStringParam,
+        simReleaseBuffer,
+        sim_stringparam_pythondir,
+    )
+    pythonDirPtr = simGetStringParam(sim_stringparam_pythondir)
+    pythonDir = ctypes.string_at(pythonDirPtr).decode('utf-8')
+    simReleaseBuffer(pythonDirPtr)
+    sys.path.append(pythonDir)
+
+    # load lua functions for call(), getObject(), etc...:
     call('require', ('scriptClientBridge',))
 
 
 @functools.cache
 def getTypeHints(func):
-    calltip = importCalltipModule()
+    import calltip
     c = call('sim.getApiInfo', [-1, func], (('int', 'string'), ('string')))
     if not c:
         return (None, None)
