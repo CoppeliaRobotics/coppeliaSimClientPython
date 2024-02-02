@@ -17,17 +17,38 @@ c_ubyte_p = POINTER(c_ubyte)
 c_callbackfn_p = CFUNCTYPE(c_int, c_int)
 
 
+if builtins.coppeliasim_library in ('default', 'default-headless'):
+    if builtins.coppeliasim_library == 'default':
+        defaultLibNameBase = 'coppeliaSim'
+    elif builtins.coppeliasim_library == 'default-headless':
+        defaultLibNameBase = 'coppeliaSimHeadless'
+    from pathlib import Path
+    libPath = Path(__file__).absolute().parent.parent.parent
+    import platform
+    plat = platform.system()
+    if plat == 'Windows':
+        libPath /= f'{defaultLibNameBase}.dll'
+    elif plat == 'Linux':
+        libPath /= f'lib{defaultLibNameBase}.so'
+    elif plat == 'Darwin':
+        libPath /= f'../MacOS/lib{defaultLibNameBase}.dylib'
+    builtins.coppeliasim_library = str(libPath)
+
 if not os.path.isfile(builtins.coppeliasim_library):
     print(f'{os.path.basename(sys.argv[0])}: error: the specified coppeliaSim library does not exist: {builtins.coppeliasim_library}')
     sys.exit(1)
 
-appDir = os.path.dirname(builtins.coppeliasim_library)
-os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir
+
+def appDir():
+    return os.path.dirname(builtins.coppeliasim_library)
+
+
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = appDir()
 
 import platform
 plat = platform.system()
 if plat == 'Darwin':
-    fd = os.path.normpath(appDir + '/../Frameworks')
+    fd = os.path.normpath(appDir() + '/../Frameworks')
     os.environ['DYLD_LIBRARY_PATH'] = fd + ':' + os.environ.get('DYLD_LIBRARY_PATH', '')
     print(f'If next step fails, do: export DYLD_LIBRARY_PATH={fd}:$DYLD_LIBRARY_PATH and relaunch.')
 
@@ -117,7 +138,7 @@ coppeliaSimLib.simDebugStack.restype = c_int
 coppeliaSimLib.simGetStringParam.argtypes = [c_int]
 coppeliaSimLib.simGetStringParam.restype = c_void_p
 
-__all__ = []
+__all__ = ['appDir']
 
 for name in dir(coppeliaSimLib):
     if name.startswith('sim'):

@@ -11,8 +11,8 @@ def add(parser):
     parser.add_argument('-O', '--options', metavar='options', type=int, default=-1,
                         help='options for the GUI')
     parser.add_argument('-L', '--coppeliasim-library', metavar='library', type=str,
-                        default='default',
-                        help='Path to the coppeliaSim shared library')
+                        default=None,
+                        help='Path to the coppeliaSim shared library. Defaults to "default" or "default-headless" depending on the -H option, indicating to determine the location of the library automatically, relative to the script filesystem location.')
     parser.add_argument('-g', '--app-arg', metavar='arg', type=str,
                         action='append',
                         help='Represents an optional argument that can be queried within CoppeliaSim with the sim.stringparam_app_arg1 ... sim.stringparam_app_arg9 parameters')
@@ -34,6 +34,14 @@ def add(parser):
 
 
 def parse(args):
+    import builtins
+    if args.coppeliasim_library is None:
+        if args.true_headless:
+            args.coppeliasim_library = 'default-headless'
+        else:
+            args.coppeliasim_library = 'default'
+    builtins.coppeliasim_library = args.coppeliasim_library
+
     from ctypes import c_char_p
     from coppeliasim.lib import (
         simSetStringParam,
