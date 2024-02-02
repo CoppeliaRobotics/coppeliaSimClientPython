@@ -23,7 +23,7 @@ if builtins.coppeliasim_library in ('default', 'default-headless'):
     elif builtins.coppeliasim_library == 'default-headless':
         defaultLibNameBase = 'coppeliaSimHeadless'
     from pathlib import Path
-    libPath = Path(__file__).absolute().parent.parent.parent
+    libPath = Path(__file__).absolute().parent.parent
     import platform
     plat = platform.system()
     if plat == 'Windows':
