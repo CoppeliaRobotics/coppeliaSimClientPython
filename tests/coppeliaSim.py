@@ -1,11 +1,8 @@
-# need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
-# to avoid libraries load errors
+# macOS: need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
+#        to avoid libraries load errors
 
 import argparse
-import ctypes
 import sys
-import threading
-import traceback
 
 from pathlib import Path
 
@@ -16,11 +13,10 @@ def simThreadFunc():
         simInitialize,
         simLoop,
         simDeinitialize,
-        simGetExitRequest,
         simRegCallback,
-        simReleaseBuffer,
-        simGetStringParam
     )
+    import coppeliasim.stack
+    import coppeliasim.bridge
 
     def simStart():
         if sim.getSimulationState() == sim.simulation_stopped:
@@ -37,13 +33,10 @@ def simThreadFunc():
             sim.stopSimulation()
             simLoop(None, 0)
 
-    import coppeliasim.stack
-    import coppeliasim.bridge
-
     @coppeliasim.stack.callback
     def myCallback(state, data):
         print('myCallback called with args:', state, data)
-        return True # i.e. valid config
+        return True  # i.e. valid config
 
     simInitialize(appDir().encode('utf-8'), 0)
 
@@ -93,7 +86,7 @@ def simThreadFunc():
         ikTarget = simToIkObjectMapping[simTarget]
         ikBase = simToIkObjectMapping[simBase]
 
-        simStart() # start simulation
+        simStart()  # start simulation
         for c in range(200):
             simIK.setObjectMatrix(ikEnv, ikTarget, sim.getObjectMatrix(target, simBase), ikBase)
 
@@ -109,14 +102,17 @@ def simThreadFunc():
                 funcs.stopJointMotion()
 
             simStep()
-        simStop() #stop simulation and wait until really stopped
+        simStop()  # stop simulation and wait until really stopped
 
         info = sim.getShapeViz(mesh, 0)
+        print(info)
 
     except Exception:
+        import traceback
         print(traceback.format_exc())
 
     simDeinitialize()
+
 
 if __name__ == '__main__':
     # allow running from repo directly:
@@ -127,11 +123,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
     coppeliasim.cmdopt.add(parser)
     args = parser.parse_args()
+
+    # set builtins.coppeliasim_library according to command line options:
     options = coppeliasim.cmdopt.read_args(args)
 
     if args.true_headless:
         simThreadFunc()
     else:
+        import threading
         from coppeliasim.lib import simRunGui
         t = threading.Thread(target=simThreadFunc)
         t.start()

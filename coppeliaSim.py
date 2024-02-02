@@ -1,10 +1,7 @@
-# need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
-# to avoid libraries load errors
+# macOS: need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
+#        to avoid libraries load errors
 
 import argparse
-import threading
-
-from pathlib import Path
 
 
 # refer to the manual (en/coppeliaSimLibrary.htm) for customization examples
@@ -32,11 +29,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
     coppeliasim.cmdopt.add(parser)
     args = parser.parse_args()
+
+    # set builtins.coppeliasim_library according to command line options:
     options = coppeliasim.cmdopt.read_args(args)
 
     if args.true_headless:
         simThreadFunc()
     else:
+        import threading
         from coppeliasim.lib import simRunGui
         t = threading.Thread(target=simThreadFunc)
         t.start()
