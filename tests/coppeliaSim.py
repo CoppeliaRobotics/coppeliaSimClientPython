@@ -8,7 +8,6 @@ import threading
 import traceback
 
 from pathlib import Path
-from ctypes import *
 
 
 def simThreadFunc():
@@ -38,15 +37,15 @@ def simThreadFunc():
             sim.stopSimulation()
             simLoop(None, 0)
 
-    from coppeliasim.callback import callback
+    import coppeliasim.stack
     import coppeliasim.bridge
 
-    @callback
+    @coppeliasim.stack.callback
     def myCallback(state, data):
         print('myCallback called with args:', state, data)
         return True # i.e. valid config
 
-    simInitialize(ctypes.c_char_p(appDir().encode('utf-8')), 0)
+    simInitialize(appDir().encode('utf-8'), 0)
 
     try:
         coppeliasim.bridge.load()
@@ -63,6 +62,7 @@ def simThreadFunc():
         testScene = str(Path(__file__).parent / 'testScene.ttt')
         sim.loadScene(testScene)
 
+        from ctypes import CFUNCTYPE, c_int
         myCallback_c = CFUNCTYPE(c_int, c_int)(myCallback)
         simRegCallback(0, myCallback_c)
 

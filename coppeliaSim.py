@@ -2,7 +2,6 @@
 # to avoid libraries load errors
 
 import argparse
-import ctypes
 import threading
 
 from pathlib import Path
@@ -20,7 +19,7 @@ def simThreadFunc():
         simGetExitRequest,
     )
 
-    simInitialize(ctypes.c_char_p(appDir().encode('utf-8')), 0)
+    simInitialize(appDir().encode('utf-8'), 0)
 
     while not simGetExitRequest():
         simLoop(None, 0)
