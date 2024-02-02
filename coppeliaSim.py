@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
     coppeliasim.cmdopt.add(parser)
     args = parser.parse_args()
-    options = coppeliasim.cmdopt.parse(args)
+    options = coppeliasim.cmdopt.read_args(args)
 
     if args.true_headless:
         simThreadFunc()

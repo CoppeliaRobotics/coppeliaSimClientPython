@@ -33,7 +33,7 @@ def add(parser):
                         help='Loads and runs an additional add-on specified via its filename')
 
 
-def parse(args):
+def read_args(args):
     import builtins
     if args.coppeliasim_library is None:
         if args.true_headless:
