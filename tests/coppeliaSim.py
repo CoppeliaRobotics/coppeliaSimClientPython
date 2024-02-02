@@ -40,14 +40,14 @@ def simThreadFunc(appDir):
 
     from coppeliasim.callback import callback
     import coppeliasim.bridge
-    
+
     @callback
     def myCallback(state, data):
         print('myCallback called with args:', state, data)
         return True # i.e. valid config
-    
+
     simInitialize(ctypes.c_char_p(appDir.encode('utf-8')), 0)
-    
+
     try:
         coppeliasim.bridge.load()
 
@@ -60,11 +60,12 @@ def simThreadFunc(appDir):
         version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
         print('CoppeliaSim version is:', version)
 
-        sim.loadScene('testScene.ttt')
-        
+        testScene = str(Path(__file__).parent / 'testScene.ttt')
+        sim.loadScene(testScene)
+
         myCallback_c = CFUNCTYPE(c_int, c_int)(myCallback)
         simRegCallback(0, myCallback_c)
-        
+
         simJointHandles = []
         robot = sim.getObject('/LBR4p')
         for i in range(7):
@@ -73,16 +74,16 @@ def simThreadFunc(appDir):
         simBase = robot
         simTarget = sim.getObject('./target', {'proxy': robot})
         target = sim.getObject('./testTarget5', {'proxy': robot})
-        
+
         sensor1 = sim.getObject('/sensor1')
         sensor2 = sim.getObject('/sensor2')
         cameraJoint = sim.getObject('/cameraJoint')
         scriptHandle = sim.getScript(sim.scripttype_childscript, cameraJoint)
         funcs = sim.getScriptFunctions(scriptHandle)
         mesh = sim.getObject('/mesh')
-        
+
         ikEnv = simIK.createEnvironment()
-        
+
         ikGroup = simIK.createGroup(ikEnv)
         ikElement, simToIkObjectMapping, ikToSimObjectMapping = simIK.addElementFromScene(ikEnv, ikGroup, simBase, simTip, simTarget, simIK.constraint_pose)
         simIK.setElementPrecision(ikEnv, ikGroup, ikElement, [0.00005, 0.0017])
@@ -91,33 +92,37 @@ def simThreadFunc(appDir):
             ikJointHandles.append(simToIkObjectMapping[simJointHandles[i]])
         ikTarget = simToIkObjectMapping[simTarget]
         ikBase = simToIkObjectMapping[simBase]
-        
+
         simStart() # start simulation
         for c in range(200):
             simIK.setObjectMatrix(ikEnv, ikTarget, sim.getObjectMatrix(target, simBase), ikBase)
-            
+
             state = simIK.findConfig(ikEnv, ikGroup, ikJointHandles, 0.25, 0.1, [1, 1, 1, 0.1], 'ccallback0', simJointHandles)
             if state:
                 for i in range(7):
                     sim.setJointPosition(simJointHandles[i], state[i])
-            
+
             img, res = sim.getVisionSensorImg(sensor1)
             sim.setVisionSensorImg(sensor2, img)
-            
+
             if c == 150:
                 funcs.stopJointMotion()
-                    
+
             simStep()
         simStop() #stop simulation and wait until really stopped
-        
+
         info = sim.getShapeViz(mesh, 0)
-        
+
     except Exception:
         print(traceback.format_exc())
 
     simDeinitialize()
 
 if __name__ == '__main__':
+    # allow running from repo directly:
+    if (d := Path(__file__).absolute().parent).name == 'tests':
+        sys.path.append(str(d.parent))
+
     import coppeliasim.cmdopt
     parser = argparse.ArgumentParser(description='CoppeliaSim client.', add_help=False)
     coppeliasim.cmdopt.add(parser)
