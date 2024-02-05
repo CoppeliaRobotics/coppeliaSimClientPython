@@ -52,7 +52,7 @@ def simThreadFunc():
         version = '.'.join(str(v // 100**(3-i) % 100) for i in range(4))
         print('CoppeliaSim version is:', version)
 
-        testScene = str(Path(__file__).parent / 'testScene.ttt')
+        testScene = str(Path(__file__).parent / 'various.ttt')
         sim.loadScene(testScene)
 
         from ctypes import CFUNCTYPE, c_int
