@@ -4,7 +4,9 @@ project(coppeliaSimClientApplication)
 set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DQT_FRAMEWORK)
-find_package(Qt5 COMPONENTS Core REQUIRED)
+set(Qt Qt5 CACHE STRING "Qt version to use (e.g. Qt5)")
+set_property(CACHE Qt PROPERTY STRINGS Qt5 Qt6)
+find_package(${Qt} COMPONENTS Core REQUIRED)
 
 if(NOT COPPELIASIM_INCLUDE_DIR)
     if(DEFINED ENV{COPPELIASIM_ROOT_DIR})
