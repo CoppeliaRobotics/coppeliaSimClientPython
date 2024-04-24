@@ -1,6 +1,3 @@
-# macOS: need to set DYLD_LIBRARY_PATH=$PWD/../Frameworks
-#        to avoid libraries load errors
-
 import argparse
 
 
