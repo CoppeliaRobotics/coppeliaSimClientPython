@@ -71,7 +71,7 @@ def simThreadFunc():
         sensor1 = sim.getObject('/sensor1')
         sensor2 = sim.getObject('/sensor2')
         cameraJoint = sim.getObject('/cameraJoint')
-        scriptHandle = sim.getScript(sim.scripttype_childscript, cameraJoint)
+        scriptHandle = sim.getScript(sim.scripttype_simulation, cameraJoint)
         funcs = sim.getScriptFunctions(scriptHandle)
         mesh = sim.getObject('/mesh')
 

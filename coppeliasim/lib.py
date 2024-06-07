@@ -158,6 +158,13 @@ const.sim_stack_table_not_table = -3
 const.sim_stack_table_map = -2
 const.sim_stack_table_empty = 0
 
+const.sim_scripttype_main = 0
+const.sim_scripttype_simulation = 1
+const.sim_scripttype_addon = 2
+const.sim_scripttype_customization = 6
+const.sim_scripttype_sandbox = 8
+const.sim_scripttype_passive = 9
+
 const.sim_scripttype_mainscript = 0
 const.sim_scripttype_childscript = 1
 const.sim_scripttype_addonscript = 2
