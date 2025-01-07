@@ -70,9 +70,8 @@ def simThreadFunc():
 
         sensor1 = sim.getObject('/sensor1')
         sensor2 = sim.getObject('/sensor2')
-        cameraJoint = sim.getObject('/cameraJoint')
-        scriptHandle = sim.getScript(sim.scripttype_simulation, cameraJoint)
-        funcs = sim.getScriptFunctions(scriptHandle)
+        cameraJointScript = sim.getObject('/cameraJoint/script')
+        funcs = sim.getScriptFunctions(cameraJointScript)
         mesh = sim.getObject('/mesh')
 
         ikEnv = simIK.createEnvironment()
@@ -105,7 +104,7 @@ def simThreadFunc():
         simStop()  # stop simulation and wait until really stopped
 
         info = sim.getShapeViz(mesh, 0)
-        print(info)
+        #print(info)
 
     except Exception:
         import traceback

@@ -33,11 +33,11 @@ def simThreadFunc():
     def stateValidation(state):
         global omplTask, collisionPairs
         if omplTask is None:
-            omplTask = sim.getStringSignal('omplTask').decode('utf-8')
+            omplTask = sim.getStringProperty(sim.handle_scene, 'signal.omplTask')
         if collisionPairs is None:
             collisionPairs = [
-                sim.getInt32Signal('omplColl-1'),
-                sim.getInt32Signal('omplColl-2'),
+                sim.getIntProperty(sim.handle_scene, 'signal.omplColl1'),
+                sim.getIntProperty(sim.handle_scene, 'signal.omplColl2'),
             ]
 
         maxDistance = 0.05
